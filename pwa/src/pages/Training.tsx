@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { AnimationRenderer } from '../animations/animationManager'
 import { AnimationStage } from '../components/AnimationStage/AnimationStage'
+import { ExitConfirmation } from '../components/ExitConfirmation/ExitConfirmation'
 import { ProgressBar } from '../components/ProgressBar/ProgressBar'
 import { ResultPanel } from '../components/ResultPanel/ResultPanel'
 import { TrainingTimer } from '../components/TrainingTimer/TrainingTimer'
@@ -29,11 +30,13 @@ const phasePills: Array<{ phase: Exclude<KegelPhase, 'SUCCESS'>; label: string }
 ]
 
 export function Training() {
-  const { snapshot: training } = useTrainingSession()
+  const navigate = useNavigate()
+  const { snapshot: training, pause, resume } = useTrainingSession()
   const [sessionId] = useState(createTrainingSessionId)
   const [startedAt] = useState(() => new Date().toISOString())
   const [savedSummary, setSavedSummary] = useState<TrainingSummary>()
   const [feedback, setFeedback] = useState<TrainingDifficulty>()
+  const [showExitConfirmation, setShowExitConfirmation] = useState(false)
   const hasSaved = useRef(false)
   const previousPhase = useRef<KegelPhase>()
 
@@ -67,6 +70,20 @@ export function Training() {
     setFeedback(difficulty)
   }
 
+  const handleRequestExit = () => {
+    pause()
+    setShowExitConfirmation(true)
+  }
+
+  const handleContinue = () => {
+    setShowExitConfirmation(false)
+    resume()
+  }
+
+  const handleExit = () => {
+    navigate('/')
+  }
+
   if (training.phase === 'SUCCESS') {
     return (
       <main className="screen result-screen">
@@ -85,7 +102,14 @@ export function Training() {
   return (
     <main className="screen training-screen">
       <header className="training-header">
-        <Link className="back-button" to="/" aria-label="返回首页">‹</Link>
+        <button
+          aria-label="返回首页"
+          className="back-button"
+          onClick={handleRequestExit}
+          type="button"
+        >
+          ‹
+        </button>
         <div>
           <span className="training-theme-label">ENERGY CORE</span>
           <h1>能量核心充能</h1>
@@ -126,6 +150,9 @@ export function Training() {
         <span aria-hidden="true">●</span>
         保持身体放松，只专注于盆底肌区域
       </p>
+      {showExitConfirmation && (
+        <ExitConfirmation onContinue={handleContinue} onExit={handleExit} />
+      )}
     </main>
   )
 }
