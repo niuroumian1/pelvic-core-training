@@ -6,17 +6,27 @@ import { Training } from './Training'
 
 const {
   createTrainingSessionId,
+  pausedState,
   pause,
   recordCompletion,
   resume,
   updateFeedback,
-} = vi.hoisted(() => ({
-  createTrainingSessionId: vi.fn(() => 'training-session-id'),
-  pause: vi.fn(),
-  recordCompletion: vi.fn(),
-  resume: vi.fn(),
-  updateFeedback: vi.fn(),
-}))
+} = vi.hoisted(() => {
+  const pausedState = { value: false }
+
+  return {
+    createTrainingSessionId: vi.fn(() => 'training-session-id'),
+    pausedState,
+    pause: vi.fn(() => {
+      pausedState.value = true
+    }),
+    recordCompletion: vi.fn(),
+    resume: vi.fn(() => {
+      pausedState.value = false
+    }),
+    updateFeedback: vi.fn(),
+  }
+})
 
 vi.mock('../hooks/useTrainingSession', () => ({
   useTrainingSession: () => ({
@@ -32,7 +42,7 @@ vi.mock('../hooks/useTrainingSession', () => ({
     },
     pause,
     resume,
-    isPaused: false,
+    isPaused: pausedState.value,
   }),
 }))
 
@@ -56,13 +66,17 @@ function renderTraining() {
 }
 
 describe('Training', () => {
-  beforeEach(() => vi.clearAllMocks())
+  beforeEach(() => {
+    pausedState.value = false
+    vi.clearAllMocks()
+  })
   afterEach(cleanup)
 
-  it('pauses before asking whether to exit and resumes when continuing', async () => {
+  it('marks the animation paused while confirming and clears the marker after continuing', async () => {
     const user = userEvent.setup()
 
     renderTraining()
+    const trainingScreen = document.querySelector('.training-screen')
 
     await user.click(screen.getByRole('button', { name: '返回首页' }))
 
@@ -71,6 +85,7 @@ describe('Training', () => {
     ).toBeTruthy()
     expect(pause).toHaveBeenCalledTimes(1)
     expect(screen.queryByText('home sentinel')).toBeNull()
+    expect(trainingScreen?.getAttribute('data-training-paused')).toBe('true')
 
     await user.click(screen.getByRole('button', { name: '继续训练' }))
 
@@ -78,6 +93,24 @@ describe('Training', () => {
       screen.queryByRole('dialog', { name: '结束本次训练？' }),
     ).toBeNull()
     expect(resume).toHaveBeenCalledTimes(1)
+    expect(trainingScreen?.hasAttribute('data-training-paused')).toBe(false)
+  })
+
+  it('isolates the training screen while modal and restores focus after continuing', async () => {
+    const user = userEvent.setup()
+
+    renderTraining()
+    const backButton = screen.getByRole('button', { name: '返回首页' })
+    const trainingScreen = document.querySelector('.training-screen')
+
+    await user.click(backButton)
+
+    expect(trainingScreen?.hasAttribute('inert')).toBe(true)
+
+    await user.click(screen.getByRole('button', { name: '继续训练' }))
+
+    expect(trainingScreen?.hasAttribute('inert')).toBe(false)
+    expect(document.activeElement).toBe(backButton)
   })
 
   it('returns home without recording an incomplete session', async () => {

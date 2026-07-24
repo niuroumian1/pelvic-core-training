@@ -31,12 +31,13 @@ const phasePills: Array<{ phase: Exclude<KegelPhase, 'SUCCESS'>; label: string }
 
 export function Training() {
   const navigate = useNavigate()
-  const { snapshot: training, pause, resume } = useTrainingSession()
+  const { snapshot: training, pause, resume, isPaused } = useTrainingSession()
   const [sessionId] = useState(createTrainingSessionId)
   const [startedAt] = useState(() => new Date().toISOString())
   const [savedSummary, setSavedSummary] = useState<TrainingSummary>()
   const [feedback, setFeedback] = useState<TrainingDifficulty>()
   const [showExitConfirmation, setShowExitConfirmation] = useState(false)
+  const backButtonRef = useRef<HTMLButtonElement>(null)
   const hasSaved = useRef(false)
   const previousPhase = useRef<KegelPhase>()
 
@@ -98,61 +99,73 @@ export function Training() {
 
   const content = phaseContent[training.phase]
   const remainingSeconds = Math.ceil(training.remainingMs / 1_000)
+  const backgroundIsolationProps = showExitConfirmation ? { inert: '' } : {}
 
   return (
-    <main className="screen training-screen">
-      <header className="training-header">
-        <button
-          aria-label="返回首页"
-          className="back-button"
-          onClick={handleRequestExit}
-          type="button"
-        >
-          ‹
-        </button>
-        <div>
-          <span className="training-theme-label">ENERGY CORE</span>
-          <h1>能量核心充能</h1>
-          <p>第 {training.currentSet} / {training.totalSets} 组</p>
-        </div>
-        <span className="training-header__spacer" aria-hidden="true" />
-      </header>
-
-      <ProgressBar current={training.currentSet} total={training.totalSets} />
-
-      <AnimationStage themeId="energy-core" variant="training">
-        <AnimationRenderer
-          animationId="energy-core"
-          state={{
-            phase: training.phase,
-            phaseProgress: training.phaseProgress,
-          }}
-        />
-        <TrainingTimer
-          label={content.label}
-          value={String(remainingSeconds)}
-          hint={content.hint}
-        />
-      </AnimationStage>
-
-      <ol className="phase-pills" aria-label="训练流程">
-        {phasePills.map((item) => (
-          <li
-            className={training.phase === item.phase ? 'phase-pill is-active' : 'phase-pill'}
-            key={item.phase}
+    <>
+      <main
+        {...backgroundIsolationProps}
+        className="screen training-screen"
+        data-training-paused={isPaused ? 'true' : undefined}
+      >
+        <header className="training-header">
+          <button
+            aria-label="返回首页"
+            className="back-button"
+            onClick={handleRequestExit}
+            ref={backButtonRef}
+            type="button"
           >
-            {item.label}
-          </li>
-        ))}
-      </ol>
+            ‹
+          </button>
+          <div>
+            <span className="training-theme-label">ENERGY CORE</span>
+            <h1>能量核心充能</h1>
+            <p>第 {training.currentSet} / {training.totalSets} 组</p>
+          </div>
+          <span className="training-header__spacer" aria-hidden="true" />
+        </header>
 
-      <p className="training-guidance">
-        <span aria-hidden="true">●</span>
-        保持身体放松，只专注于盆底肌区域
-      </p>
+        <ProgressBar current={training.currentSet} total={training.totalSets} />
+
+        <AnimationStage themeId="energy-core" variant="training">
+          <AnimationRenderer
+            animationId="energy-core"
+            state={{
+              phase: training.phase,
+              phaseProgress: training.phaseProgress,
+            }}
+          />
+          <TrainingTimer
+            label={content.label}
+            value={String(remainingSeconds)}
+            hint={content.hint}
+          />
+        </AnimationStage>
+
+        <ol className="phase-pills" aria-label="训练流程">
+          {phasePills.map((item) => (
+            <li
+              className={training.phase === item.phase ? 'phase-pill is-active' : 'phase-pill'}
+              key={item.phase}
+            >
+              {item.label}
+            </li>
+          ))}
+        </ol>
+
+        <p className="training-guidance">
+          <span aria-hidden="true">●</span>
+          保持身体放松，只专注于盆底肌区域
+        </p>
+      </main>
       {showExitConfirmation && (
-        <ExitConfirmation onContinue={handleContinue} onExit={handleExit} />
+        <ExitConfirmation
+          onContinue={handleContinue}
+          onExit={handleExit}
+          returnFocusRef={backButtonRef}
+        />
       )}
-    </main>
+    </>
   )
 }
