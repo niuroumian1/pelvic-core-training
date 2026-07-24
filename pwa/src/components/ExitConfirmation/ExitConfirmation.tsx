@@ -21,13 +21,13 @@ export function ExitConfirmation({ onContinue, onExit }: ExitConfirmationProps) 
         role="dialog"
       >
         <p className="exit-confirmation__eyebrow">TRAINING PAUSED</p>
-        <h2 id="exit-confirmation-title">缁撴潫鏈璁粌锛焋</h2>
-        <p>褰撳墠杩涘害涓嶄細淇濆瓨锛屼綘涔熷彲浠ョ户缁畬鎴愭湰缁勮缁冦€俙</p>
+        <h2 id="exit-confirmation-title">结束本次训练？</h2>
+        <p>当前进度不会保存，你也可以继续完成本组训练。</p>
         <button className="primary-action" onClick={onContinue} ref={continueButtonRef} type="button">
-          缁х画璁粌
+          继续训练
         </button>
         <button className="exit-confirmation__exit" onClick={onExit} type="button">
-          缁撴潫璁粌
+          结束训练
         </button>
       </section>
     </div>

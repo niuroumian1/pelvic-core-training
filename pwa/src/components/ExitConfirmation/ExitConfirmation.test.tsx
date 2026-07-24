@@ -13,10 +13,10 @@ describe('ExitConfirmation', () => {
     render(<ExitConfirmation onContinue={onContinue} onExit={vi.fn()} />)
 
     expect(
-      screen.getByRole('dialog', { name: '缁撴潫鏈璁粌锛焋' }),
+      screen.getByRole('dialog', { name: '结束本次训练？' }),
     ).toBeTruthy()
 
-    const continueButton = screen.getByRole('button', { name: '缁х画璁粌' })
+    const continueButton = screen.getByRole('button', { name: '继续训练' })
     expect(document.activeElement).toBe(continueButton)
 
     await user.click(continueButton)
@@ -30,7 +30,7 @@ describe('ExitConfirmation', () => {
 
     render(<ExitConfirmation onContinue={vi.fn()} onExit={onExit} />)
 
-    await user.click(screen.getByRole('button', { name: '缁撴潫璁粌' }))
+    await user.click(screen.getByRole('button', { name: '结束训练' }))
 
     expect(onExit).toHaveBeenCalledTimes(1)
   })
