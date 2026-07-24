@@ -29,7 +29,7 @@ const phasePills: Array<{ phase: Exclude<KegelPhase, 'SUCCESS'>; label: string }
 ]
 
 export function Training() {
-  const training = useTrainingSession()
+  const { snapshot: training } = useTrainingSession()
   const [sessionId] = useState(createTrainingSessionId)
   const [startedAt] = useState(() => new Date().toISOString())
   const [savedSummary, setSavedSummary] = useState<TrainingSummary>()
