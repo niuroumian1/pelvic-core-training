@@ -1,0 +1,9 @@
+{
+  "name": "核心训练 Demo",
+  "short_name": "核心训练",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#050A12",
+  "theme_color": "#050A12",
+  "description": "男性盆底肌游戏化训练体验"
+}
