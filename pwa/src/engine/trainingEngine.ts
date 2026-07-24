@@ -119,6 +119,7 @@ export class TrainingEngine<Phase extends string> {
   private listeners = new Set<Listener<Phase>>()
   private intervalHandle: number | null = null
   private lastTickAt = 0
+  private paused = false
 
   constructor(
     private readonly protocol: TimedTrainingProtocol<Phase>,
@@ -139,7 +140,11 @@ export class TrainingEngine<Phase extends string> {
   }
 
   start = () => {
-    if (this.intervalHandle !== null || this.snapshot.phaseKind === 'success') {
+    if (
+      this.intervalHandle !== null ||
+      this.paused ||
+      this.snapshot.phaseKind === 'success'
+    ) {
       return
     }
 
@@ -148,13 +153,35 @@ export class TrainingEngine<Phase extends string> {
   }
 
   stop = () => {
+    if (this.intervalHandle !== null) {
+      this.scheduler.clearInterval(this.intervalHandle)
+      this.intervalHandle = null
+    }
+
+    this.paused = false
+  }
+
+  pause = () => {
     if (this.intervalHandle === null) {
       return
     }
 
     this.scheduler.clearInterval(this.intervalHandle)
     this.intervalHandle = null
+    this.paused = true
   }
+
+  resume = () => {
+    if (!this.paused || this.snapshot.phaseKind === 'success') {
+      return
+    }
+
+    this.lastTickAt = this.scheduler.now()
+    this.intervalHandle = this.scheduler.setInterval(this.tick, 100)
+    this.paused = false
+  }
+
+  isPaused = () => this.paused
 
   private tick = () => {
     const now = this.scheduler.now()
