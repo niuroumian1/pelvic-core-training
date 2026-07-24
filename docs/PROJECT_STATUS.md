@@ -24,7 +24,7 @@
 - `npm test`：5 个测试文件、17 项测试通过。
 - `npm run build`：TypeScript 检查和 Vite PWA 生产构建通过。
 - PWA 构建会生成 Manifest、Service Worker 和离线预缓存。
-- 当前工作区根目录不是 Git 仓库，尚无可用于回退的提交基线。
+- 当前工作区已建立 Git 提交基线，并持续保留后续变更提交以便回退。
 
 在任何后续功能修改前，应先保持上述基线可复现。
 
