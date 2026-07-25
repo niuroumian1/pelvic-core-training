@@ -141,7 +141,9 @@ RELAX 5 秒
 - PWA 单元测试 25/25 通过，GitHub Pages 路径生产构建通过。
 - 已完成 Samsung Galaxy S23（360 × 780 CSS）视口的浏览器验收：退出确认对话框为 1 个、无横向溢出、`scrollHeight` 为 780，默认焦点为“继续训练”；暂停超过 5 秒后阶段/倒计时保持 `RELAX/1`，继续后从 `RELAX/1` 恢复；确认退出返回首页，历史完成次数保持 1、总经验保持 10；控制台为 0 个 error/warning。
 - 本轮退出确认变更合并后，本机与 Samsung Galaxy S23 局域网真机复测均通过。
-- GitHub Pages HTTPS 部署配置已完成，线上安装、图标和离线冷启动仍待发布后确认。
+- GitHub Pages HTTPS 已发布；首页、Manifest、SVG 图标、Service Worker 均返回 200，
+  训练页直接刷新可加载 SPA 回退外壳。
+- Samsung Galaxy S23 的主屏幕安装、独立窗口启动、图标观感和离线冷启动仍待真机确认。
 
 在扩展新功能前，建议按以下顺序处理：
 

@@ -48,6 +48,21 @@
 - 离线冷启动
 - 长时间连续训练时的耗电表现
 
+## HTTPS 自动检查
+
+GitHub Pages 已发布到：
+
+```text
+https://niuroumian1.github.io/pelvic-core-training/
+```
+
+- 首页：HTTP 200
+- Manifest：HTTP 200
+- 应用图标：HTTP 200
+- Service Worker：HTTP 200
+- `/training` 直接刷新：可返回包含应用资源的 SPA 回退外壳
+- Manifest 的 `start_url` 与 `scope`：`/pelvic-core-training/`
+
 ## S23 测试连接方法
 
 推荐使用 USB + ADB 端口转发：
