@@ -1,6 +1,37 @@
 import { describe, expect, it } from 'vitest'
 import { kegelProtocol } from './kegelProtocol'
-import { advanceTraining, createInitialSnapshot } from './trainingEngine'
+import {
+  advanceTraining,
+  createInitialSnapshot,
+  TrainingEngine,
+  type TrainingScheduler,
+} from './trainingEngine'
+
+class FakeScheduler implements TrainingScheduler {
+  private callbacks = new Map<number, () => void>()
+  private nextHandle = 1
+  private currentTime = 0
+
+  intervalRegistrations = 0
+
+  now = () => this.currentTime
+
+  setInterval = (callback: () => void) => {
+    const handle = this.nextHandle++
+    this.callbacks.set(handle, callback)
+    this.intervalRegistrations += 1
+    return handle
+  }
+
+  clearInterval = (handle: number) => {
+    this.callbacks.delete(handle)
+  }
+
+  advance = (elapsedMs: number) => {
+    this.currentTime += elapsedMs
+    this.callbacks.forEach((callback) => callback())
+  }
+}
 
 describe('trainingEngine', () => {
   it('starts in READY with a three-second countdown', () => {
@@ -67,6 +98,63 @@ describe('trainingEngine', () => {
       phase: 'CONTRACT',
       remainingMs: 4_500,
     })
+  })
+
+  it('excludes paused wall time from the READY countdown', () => {
+    const scheduler = new FakeScheduler()
+    const engine = new TrainingEngine(kegelProtocol, scheduler)
+
+    engine.start()
+    scheduler.advance(1_000)
+    engine.pause()
+    scheduler.advance(5_000)
+    engine.resume()
+    scheduler.advance(500)
+
+    expect(engine.getSnapshot()).toMatchObject({
+      phase: 'READY',
+      remainingMs: 1_500,
+    })
+  })
+
+  it('makes duplicate pause and resume calls safe without duplicate timers', () => {
+    const scheduler = new FakeScheduler()
+    const engine = new TrainingEngine(kegelProtocol, scheduler)
+
+    engine.start()
+    engine.pause()
+    engine.pause()
+    engine.resume()
+    engine.resume()
+
+    expect(engine.isPaused()).toBe(false)
+    expect(scheduler.intervalRegistrations).toBe(2)
+  })
+
+  it('preserves the snapshot while pause clears the active interval', () => {
+    const scheduler = new FakeScheduler()
+    const engine = new TrainingEngine(kegelProtocol, scheduler)
+
+    engine.start()
+    scheduler.advance(1_000)
+    engine.pause()
+    const pausedSnapshot = engine.getSnapshot()
+    scheduler.advance(5_000)
+
+    expect(engine.getSnapshot()).toEqual(pausedSnapshot)
+  })
+
+  it('does not restart after reaching SUCCESS', () => {
+    const scheduler = new FakeScheduler()
+    const engine = new TrainingEngine(kegelProtocol, scheduler)
+
+    engine.start()
+    scheduler.advance(42_000)
+    engine.stop()
+    engine.start()
+
+    expect(engine.getSnapshot().phase).toBe('SUCCESS')
+    expect(scheduler.intervalRegistrations).toBe(1)
   })
 })
 

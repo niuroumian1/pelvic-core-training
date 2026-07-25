@@ -559,6 +559,15 @@ p {
   animation: field-stabilize 1.2s ease-in-out infinite;
 }
 
+.training-screen[data-training-paused="true"] .energy-gameplay,
+.training-screen[data-training-paused="true"] .energy-gameplay::before,
+.training-screen[data-training-paused="true"] .energy-gameplay::after,
+.training-screen[data-training-paused="true"] .energy-gameplay *,
+.training-screen[data-training-paused="true"] .energy-gameplay *::before,
+.training-screen[data-training-paused="true"] .energy-gameplay *::after {
+  animation-play-state: paused;
+}
+
 .energy-gameplay[data-phase="RELAX"] .energy-gameplay__particles span {
   background: var(--animation-secondary);
 }
@@ -1014,6 +1023,67 @@ p {
     opacity: 1;
     transform: scale(1);
   }
+}
+
+.exit-confirmation {
+  position: fixed;
+  z-index: 20;
+  inset: 0;
+  display: grid;
+  align-items: end;
+  padding: 1rem;
+  padding-right: max(1rem, env(safe-area-inset-right));
+  padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  padding-left: max(1rem, env(safe-area-inset-left));
+  background: rgba(3, 10, 13, 0.72);
+  backdrop-filter: blur(8px);
+}
+
+.exit-confirmation__panel {
+  width: min(100%, 28rem);
+  margin-inline: auto;
+  padding: 1.35rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 1.5rem;
+  background: var(--surface-raised);
+  box-shadow: 0 1.5rem 4rem rgba(0, 0, 0, 0.38);
+}
+
+.exit-confirmation__eyebrow {
+  color: var(--health);
+  font-size: 0.62rem;
+  font-weight: 750;
+  letter-spacing: 0.12em;
+}
+
+.exit-confirmation__panel h2 {
+  margin: 0.45rem 0 0.55rem;
+  font-size: 1.55rem;
+}
+
+.exit-confirmation__panel p:not(.exit-confirmation__eyebrow) {
+  margin-bottom: 1.2rem;
+  color: var(--text-soft);
+  line-height: 1.65;
+}
+
+.exit-confirmation__panel button {
+  width: 100%;
+}
+
+.exit-confirmation__panel .primary-action {
+  justify-content: center;
+  margin-top: 0;
+  padding: 0.75rem 1rem;
+  border: 0;
+}
+
+.exit-confirmation__exit {
+  min-height: 3rem;
+  margin-top: 0.65rem;
+  border: 0;
+  background: transparent;
+  color: var(--text-soft);
 }
 
 @media (min-width: 48rem) {
