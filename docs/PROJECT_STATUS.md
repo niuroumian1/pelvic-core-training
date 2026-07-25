@@ -21,9 +21,10 @@
 
 截至本文更新时间：
 
-- `npm test`：6 个测试文件、22 项测试通过。
+- `npm test`：7 个测试文件、25 项测试通过。
 - `npm run build`：TypeScript 检查和 Vite PWA 生产构建通过。
 - PWA 构建会生成 Manifest、Service Worker 和离线预缓存。
+- 已配置 GitHub Actions，从 `pwa/` 自动测试、构建并发布 GitHub Pages。
 - 当前工作区已建立 Git 提交基线，并持续保留后续变更提交以便回退。
 
 在任何后续功能修改前，应先保持上述基线可复现。
@@ -137,10 +138,10 @@ RELAX 5 秒
 
 当前验收进度：
 
-- PWA 单元测试 22/22 通过，生产构建通过。
+- PWA 单元测试 25/25 通过，GitHub Pages 路径生产构建通过。
 - 已完成 Samsung Galaxy S23（360 × 780 CSS）视口的浏览器验收：退出确认对话框为 1 个、无横向溢出、`scrollHeight` 为 780，默认焦点为“继续训练”；暂停超过 5 秒后阶段/倒计时保持 `RELAX/1`，继续后从 `RELAX/1` 恢复；确认退出返回首页，历史完成次数保持 1、总经验保持 10；控制台为 0 个 error/warning。
 - 本轮退出确认变更合并后，本机与 Samsung Galaxy S23 局域网真机复测均通过。
-- PWA 安装、图标和离线冷启动仍待 HTTPS 环境确认。
+- GitHub Pages HTTPS 部署配置已完成，线上安装、图标和离线冷启动仍待发布后确认。
 
 在扩展新功能前，建议按以下顺序处理：
 

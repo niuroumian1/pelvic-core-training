@@ -3,6 +3,14 @@ import { defineConfig } from 'vitest/config'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 import { appConfig } from './src/config/appConfig'
+import {
+  resolveDeploymentBase,
+  toDeploymentPath,
+} from './src/config/deployment'
+
+const activeDeploymentBase = resolveDeploymentBase(
+  process.env.PWA_DEPLOY_TARGET,
+)
 
 function appMetadata(): Plugin {
   const replacements: Record<string, string> = {
@@ -24,6 +32,7 @@ function appMetadata(): Plugin {
 }
 
 export default defineConfig({
+  base: activeDeploymentBase,
   test: {
     environment: 'jsdom',
   },
@@ -34,7 +43,9 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: [appConfig.iconPath],
       manifest: {
-        id: appConfig.internalId,
+        id: toDeploymentPath(appConfig.internalId, activeDeploymentBase),
+        start_url: activeDeploymentBase,
+        scope: activeDeploymentBase,
         name: appConfig.displayName,
         short_name: appConfig.shortName,
         description: appConfig.description,
@@ -45,7 +56,7 @@ export default defineConfig({
         lang: 'zh-CN',
         icons: [
           {
-            src: appConfig.iconPath,
+            src: toDeploymentPath(appConfig.iconPath, activeDeploymentBase),
             sizes: 'any',
             type: 'image/svg+xml',
             purpose: 'any maskable'

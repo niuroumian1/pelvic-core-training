@@ -13,6 +13,16 @@ npm install
 npm run dev
 ```
 
+本地开发保持从 `/` 访问；GitHub Actions 发布时会自动切换为仓库子路径，
+不需要修改本地测试网址。
+
+## HTTPS 测试站
+
+- 源代码：<https://github.com/niuroumian1/pelvic-core-training>
+- GitHub Pages：<https://niuroumian1.github.io/pelvic-core-training/>
+- 推送到 `master` 后，`.github/workflows/deploy-pages.yml` 会先运行测试和
+  生产构建，全部通过后才更新 Pages。
+
 ## 架构约定
 
 - `pages/`：页面编排
